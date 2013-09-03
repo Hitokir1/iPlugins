@@ -6,7 +6,9 @@ class 'Plugin' -- {
 	if myHero.charName ~= "Varus" then return end 
 
 	local Q_RANGE, Q_SPEED, Q_DELAY, Q_WIDTH = 1600, 1850, 0, 60
-
+	local SkillQ = Caster(_Q, 1600, SPELL_LINEAR) 
+	local SkillE = Caster(_E, 925, SPELL_CIRCLE, 1750, 0.24, 235)
+	local SkillR = Caster(_R, 1075, SPELL_LINEAR_COL, 2000, 0.25, 100)
 	local combo = ComboLibrary()
 
 	local qCasted = false 
@@ -18,6 +20,8 @@ class 'Plugin' -- {
 
 	local qPrediction = nil 
 	local qTargeting = nil 
+
+	local Menu = nil
 
 	local BlightTable = {
 		"VarusW_counter_01.troy", 
@@ -45,6 +49,25 @@ class 'Plugin' -- {
 			dynamicRange = dynamicRange - OVERSHOOT_RANGE
 		end
 
+		enemy = GetEnemy(Target)
+
+		if enemy and Target then
+			if (GetTickCount() - enemy.blight.tick > 6000) or enemy.dead then enemy.blight.count = 0 end 
+		end 
+
+		-- Q Hotkey
+		if Menu.CastQMouse then 
+			--qPrediction = qTargeting:GetPrediction(mousePos)
+
+			if not qCasted --[[and GetDistance(Target) < 1600 - 2 * Target.ms]] then 
+				CastQ(0, Target)
+			end 
+			if qCasted --[[and qPrediction.networkID == Target.networkID and qPrediction:GetHitChance(Target) > 0.6 
+				and (GetTickCount() - qTick > 300 or (GetDistance(qPrediction) < 800 and GetTickCount() - qTick > 300))]]  then 
+				CastQ(1, mousePos) 
+			end 
+		end 
+
 		-- Q Fixez
 		if GetTickCount() - qFixTick > 99 then 
 			qFixTick = GetTickCount()
@@ -55,16 +78,7 @@ class 'Plugin' -- {
 		end 
 
 		if Target and AutoCarry.Keys.AutoCarry then
-
-			qPrediction = qTargeting:GetPrediction(Target)
-
-			if not qCasted and GetDistance(Target) < 1600 - 2 * Target.ms then 
-				CastQ(0, Target)
-			end 
-			if qCasted and qPrediction and GetDistance(qPrediction) < dynamicRange and qPrediction.networkID == Target.networkID and qPrediction:GetHitChance(Target) > 0.6 
-				and (GetTickCount() - qTick > 300 or (GetDistance(qPrediction) < 800 and GetTickCount() - qTick > 300)) then 
-				CastQ(1, qPrediction) 
-			end 
+			combo:CastCombo(Target)
 		end
 	end 
 
@@ -82,19 +96,54 @@ class 'Plugin' -- {
 
 	function OnGainBuff(unit, buff) 
 		if unit and buff and buff.source == myHero then 
-			PrintChat("GAINED: " .. buff.name)
+			if buff.name ~= "varuswdebuff" then return end 
+			for i, enemy in pairs(enemyTable) do 
+				if enemy and not enemy.dead and enemy.visible and enemy == unit then
+					enemy.blight.tick = GetTickCount()
+					enemy.blight.count = buff.stack 
+					PrintFloatText(unit, 0, "Blight Stacks: " .. buff.stack)
+				end 
+			end 
 		end 
 	end 
 
-	function OnChangeStack(unit, buff) 
+	function OnUpdateBuff(unit, buff) 
 		if unit and buff and buff.source == myHero then 
-			PrintChat("GAINED: " .. buff.stack)
+			if buff.name ~= "varuswdebuff" then return end 
+			for i, enemy in pairs(enemyTable) do 
+				if enemy and not enemy.dead and enemy.visible and enemy == unit then
+					enemy.blight.tick = GetTickCount()
+					enemy.blight.count = buff.stack 
+					PrintFloatText(unit, 0, "Blight Stacks: " .. buff.stack)
+				end 
+			end 
 		end 
 	end 
 
 	function Plugin:OnLoad() 
 		AutoCarry.Crosshair.SkillRange = 1600
-		combo:AddCasters({SkillQ, SkillR})
+		combo:AddCasters({SkillQ, SkillE, SkillR})
+		combo:AddCustomCast(_Q, function(Target) 
+			enemy = GetEnemy(Target)
+			return enemy and ((Menu.wStack == 0) or (enemy.blight.count == Menu.wStack and myHero:GetSpellData(_W).level >= 1)) 
+			end)
+		combo:AddCustomCast(_E, function(Target) 
+			enemy = GetEnemy(Target)
+			return enemy and ((Menu.wStack == 0) or (enemy.blight.count == Menu.wStack and myHero:GetSpellData(_W).level >= 1)) 
+			end)
+		combo:AddCast(_Q, function(Target) 
+				qPrediction = qTargeting:GetPrediction(Target)
+
+				if not qCasted and GetDistance(Target) < 1600 - 2 * Target.ms then 
+					CastQ(0, Target)
+				end 
+				if qCasted and qPrediction and GetDistance(qPrediction) < dynamicRange --[[and qPrediction.networkID == Target.networkID and qPrediction:GetHitChance(Target) > 0.6 
+					and (GetTickCount() - qTick > 300 or (GetDistance(qPrediction) < 800 and GetTickCount() - qTick > 300))]]  then 
+					CastQ(1, qPrediction) 
+				end 
+			end)
+		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R")end)
+
 		for i=0, heroManager.iCount, 1 do
 	        local playerObj = heroManager:GetHero(i)
 	        if playerObj and playerObj.team ~= myHero.team then
@@ -112,7 +161,7 @@ class 'Plugin' -- {
 		end 
 	end 
 
-	function Plugin:OnCreateObj(object)
+	function Plugin:OnDeleteObj(object)
 		if object and object.valid and object.name == "VarusQChannel.troy" and GetDistance(object) <= 150 then 
 			qCasted = false
 		end 
@@ -152,5 +201,7 @@ class 'Plugin' -- {
 		end 
 	end 
 
-	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Varus") 
+	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Varus") 
+	Menu:addParam("wStack", "Proc E stack (0 - Off; standard poke)",SCRIPT_PARAM_SLICE, 3, 0, 3, 0)
+	Menu:addParam("CastQMouse", "Cast Q to mouse position", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("Q"))
 -- }
