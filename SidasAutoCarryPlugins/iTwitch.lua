@@ -55,7 +55,7 @@ class 'Plugin' -- {
 
 	function OnGainBuff(unit, buff) 
 		if unit == nil or buff == nil then return end 
-		if buff.source == myHero then
+		if buff.source == myHero and buff.name:find("deadlyvenom") then
 			for i, enemy in pairs(enemyTable) do 
 				if enemy and not enemy.dead and enemy.visible and enemy == unit then
 					enemy.posion.tick = GetTickCount()
@@ -65,9 +65,9 @@ class 'Plugin' -- {
 		end 
 	end 
 
-	function OnChangeStack(unit, buff) 
+	function OnUpdateBuff(unit, buff) 
 		if unit == nil or buff == nil then return end 
-		if buff.source == myHero then
+		if buff.source == myHero and buff.name == "deadlyvenom" then
 			for i, enemy in pairs(enemyTable) do 
 				if enemy and not enemy.dead and enemy.visible and enemy == unit then
 					enemy.posion.tick = GetTickCount()
