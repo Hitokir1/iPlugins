@@ -1,3 +1,4 @@
+--[[ BETA ]]
 require "iFoundation_v2"
 
 class 'Plugin' -- {
