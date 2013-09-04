@@ -663,6 +663,15 @@ class "DamageCalculation" -- {
 		for _, spellName in pairs(self.spellTable) do
 			self.spells[spellName] = {name = spellName, spell = SpellString[spellName]}
 		end 
+
+		self.ignite = nil
+		if myHero:GetSpellData(SUMMONER_1).name:find("SummonerDot") then 
+			self.ignite = SUMMONER_1
+		elseif myHero:GetSpellData(SUMMONER_2).name:find("SummonerDot") then
+			self.ignite = SUMMONER_2
+		else 
+			self.ignite = nil
+	  	end
 	end
 
 	function DamageCalculation.GetDamage(spell, Target)
@@ -707,6 +716,9 @@ class "DamageCalculation" -- {
 			self:_CalculateItemDamage(Target, self.player) 
 			total = total + self.itemTotalDamage 
 		end
+		if ignite ~= nil and myHero:CanUseSpell(self.ignite) == READY then 
+			total = total + self:_GetDamage("IGNITE", Target)
+		end 
 		total = total + self:_GetDamage("AD", Target, self.player)
 		return total 
 	end
@@ -727,6 +739,9 @@ class "DamageCalculation" -- {
 			self:_CalculateItemDamage(Target) 
 			total = total + self.itemTotalDamage 
 		end
+		if self.ignite ~= nil then 
+			total = total + self:_GetDamage("IGNITE", Target)
+		end 
 		total = total + self:_GetDamage("AD", Target)
 		return total 
 	end 
@@ -1507,7 +1522,7 @@ class 'BuffManager' -- {
 		self.enemies = {}
 		AdvancedCallback:bind('OnGainBuff', function(unit, buff) self:OnGainBuff(unit, buff) end)
 		AdvancedCallback:bind('OnLoseBuff', function(unit, buff) self:OnLoseBuff(unit, buff) end)
-		AdvancedCallback:bind('OnChangeStack', function(unit, buff) self:OnChangeStack(unit, buff) end)
+		AdvancedCallback:bind('OnUpdateBuff', function(unit, buff) self:OnUpdateBuff(unit, buff) end)
 		for i=0, heroManager.iCount, 1 do
 	        local player = heroManager:GetHero(i)
 	        if player and player.team ~= myHero.team then
@@ -1554,7 +1569,7 @@ class 'BuffManager' -- {
 		end 
 	end 
 
-	function BuffManager:OnChangeStack(unit, buff) 
+	function BuffManager:OnUpdateBuff(unit, buff) 
 		if unit == nil or buff == nil then return end 
 		if unit.team ~= myHero.team then 
 			if self.enemies[unit.name] ~= nil then 
