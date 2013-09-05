@@ -95,26 +95,36 @@ class 'Plugin' -- {
 	end 
 
 	function OnGainBuff(unit, buff) 
-		if unit and buff and buff.source == myHero then 
-			if buff.name ~= "varuswdebuff" then return end 
+		if unit and buff and buff.source == myHero and buff.name:find("varusw") then 
 			for i, enemy in pairs(enemyTable) do 
 				if enemy and not enemy.dead and enemy.visible and enemy == unit then
 					enemy.blight.tick = GetTickCount()
 					enemy.blight.count = buff.stack 
-					PrintFloatText(unit, 0, "Blight Stacks: " .. buff.stack)
+					PrintFloatText(enemy, 21, "Blight Stacks: " ..buff.stack)
+				end 
+			end 
+		end 
+	end 
+
+	function OnLoseBuff(unit, buff) 
+		if unit and buff and buff.source == myHero and buff.name:find("varusw") then 
+			for i, enemy in pairs(enemyTable) do 
+				if enemy and not enemy.dead and enemy.visible and enemy == unit then
+					enemy.blight.tick = GetTickCount()
+					enemy.blight.count = 0
+					PrintFloatText(enemy, 21, "Blight Stacks: " ..buff.stack)
 				end 
 			end 
 		end 
 	end 
 
 	function OnUpdateBuff(unit, buff) 
-		if unit and buff and buff.source == myHero then 
-			if buff.name ~= "varuswdebuff" then return end 
+		if unit and buff and buff.source == myHero and buff.name:find("varusw") then 
 			for i, enemy in pairs(enemyTable) do 
 				if enemy and not enemy.dead and enemy.visible and enemy == unit then
 					enemy.blight.tick = GetTickCount()
 					enemy.blight.count = buff.stack 
-					PrintFloatText(unit, 0, "Blight Stacks: " .. buff.stack)
+					PrintFloatText(enemy, 21, "Blight Stacks: " ..buff.stack)
 				end 
 			end 
 		end 
