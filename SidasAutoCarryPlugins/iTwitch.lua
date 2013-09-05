@@ -60,6 +60,7 @@ class 'Plugin' -- {
 				if enemy and not enemy.dead and enemy.visible and enemy == unit then
 					enemy.posion.tick = GetTickCount()
 					enemy.posion.count = 1
+					PrintFloatText(enemy, 21, "Poison Stacks: " ..buff.stack)
 				end 
 			end 
 		end 
@@ -72,6 +73,7 @@ class 'Plugin' -- {
 				if enemy and not enemy.dead and enemy.visible and enemy == unit then
 					enemy.posion.tick = GetTickCount()
 					enemy.posion.count = buff.stack
+					PrintFloatText(enemy, 21, "Poison Stacks: " ..buff.stack)
 				end 
 			end 
 		end 
