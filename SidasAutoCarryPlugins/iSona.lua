@@ -9,6 +9,9 @@ class 'Plugin' -- {
 	local SkillR = Caster(_R, 1000, SPELL_LINEAR)
 
 	local Ally, damage = nil, nil 
+	local targetDamage = 0
+
+	local Menu = nil
 
 	NONE = 0 -- DERP?
 	VALOR = 1 -- AD/AP BUFF
@@ -22,49 +25,110 @@ class 'Plugin' -- {
 	}
 
 	local currentAura = NONE 
+	local powerCord = false 
 	
 	function Plugin:__init() 
 	end 
 
 	function Plugin:OnTick() 
 		Target = AutoCarry.Crosshair:GetTarget()
-		UpdateAura()
-		if Target and AutoCarry.Keys.AutoCarry then
+		if Target and AutoCarry.Keys.AutoCarry and not Monitor.IsTeleporting() then
 			Ally, damage = Monitor.GetHighestDamageAlly()
-			if not BuffManager.TargetHaveBuff(myHero, "sonapowercord") then
-				if SkillW:Ready() and Monitor.GetLowAlly() ~= nil and GetDistance(Monitor.GetLowAlly()) > SkillW.range then
-					SkillW:Cast(Target)
-				end
-				if SkillQ:Ready() and getDmg("Q", Target, myHero) < Target.health then
-					SkillQ:Cast(Target)
+			if Ally then 
+				targetDamage = DamageCalculation.CalculateRealDamage(Ally, Target) 
+			end 
+			if powerCord then 
+				if damage >= Target.health then 
+					if currentAura ~= CELERITY then 
+						SkillE:Cast(Target) 
+					end 
+					myHero:Attack(Target) 
+				elseif Ally and targetDamage >= Ally.health then 
+					if currentAura ~= PERSEVERANCE then 
+						SkillW:Cast(Target) 
+					end 
+					myHero:Attack(Target)
+				elseif (getDmg("Q", Target, myHero) * 2) < Target.health then 
+					if currentAura ~= VALOR then 
+						SkillE:Cast(Target) 
+					end 
+					myHero:Attack(Target)
 				end 
 			else
-				PrintChat("PowerCord")
-				if Ally and Target.health < damage and SkillE:Ready() and currentAura ~= CELERITY then
-					SkillE:Cast(Target)
-				elseif SkillQ:Ready() and Target.health > (getDmg("Q", Target, myHero) * 3) and currentAura ~= VALOR then
-					SkillQ:Cast(Target)
-				elseif SkillW:Ready() and currentAura ~= PERSEVERANCE then
-					SkillW:Cast(Target) 
-				end 
-				myHero:Attack(Taget) 
+				Poke(Target) 
+				Heal(Ally)
 			end 
 		end
 	end 
 
 	function Plugin:OnLoad() 
 		AutoCarry.Crosshair.SkillRange = 1000
+		AutoShield.override = true
 		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
-	function UpdateAura() 
-		for aura, value in pairs(AuraTable) do 
-			if BuffManager.TargetHaveBuff(myHero, aura) then 
-				currentAura = value
-				break 
+	function Plugin:OnGainBuff(unit, buff) 
+		if unit and buff then 
+			if buff.name == "sonapowercord" then
+				powerCord = true 
+				PrintFloatText(myHero, 21, "PowerCord!")
+			end 
+			for aura, value in pairs(AuraTable) do 
+				if buff.name == aura then 
+					currentAura = value
+					break 
+				end 
 			end 
 		end 
 	end 
 
-	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Sona") 
+	function Plugin:OnLoseBuff(unit, buff) 
+		if unit and buff then 
+			if buff.name == "sonapowercord" then
+				powerCord = false
+			end 
+		end 
+	end 
+
+	function Heal(ally)
+		if not SkillW:Ready() then return false end 
+		if ally then 
+			if (ally.health / ally.maxHealth) < (Menu.wPercent / 100) and GetDistance(ally) <= SkillW.range then
+				return SkillW:Cast(ally) 
+			end 
+		else 
+			local distance = math.huge 
+			local best = nil 
+			for _, player in pairs(_Heroes.GetObjects(ALLY, SkillW.range)) do 
+				if best == nil then 
+					best = player
+					distance = GetDistance(player)
+				elseif GetDistance(player) < distance and best.health < player.health then 
+					best = player 
+					distance = GetDistance(player) 
+				end 
+			end 
+
+			if best and GetDistance(player) < SkillW.range then 
+				if (best.health / best.maxHealth) < (Menu.wPercent / 100) then
+					return SkillW:Cast(Target) 
+				end 
+			end 
+ 		end 
+	end 
+
+	function Poke(Target)
+		if not Target or not SkillQ:Ready() then return false end 
+		if Target then 
+			if GetDistance(Target) <= SkillQ.range then 
+				local qDmg = getDmg("Q", Target, myHero) 
+				if Target.health > qDmg then 
+					return SkillQ:Cast(Target) 
+				end 
+			end 
+		end 
+	end 
+
+	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Sona") 
+	Menu:addParam("wPercent", "Heal Percentage",SCRIPT_PARAM_SLICE, 75, 0, 100, 0)
 -- }
