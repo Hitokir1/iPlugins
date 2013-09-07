@@ -12,6 +12,11 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1100
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) 
+				return Monitor.CountEnemies(Target, SkillR.width) >= 2 
+			end)
 	end 
 
 	function Plugin:OnTick() 
@@ -22,11 +27,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1100
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) 
-				return Monitor.CountEnemies(Target, SkillR.width) >= 2 
-			end)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Maokai") 

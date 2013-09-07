@@ -12,6 +12,16 @@ class 'Plugin' -- {
 	local rTick = 0
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1000
+		combo:AddCasters({SkillQ, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) return ((rTick ~= 0 and GetTickCount() - rTick < 15000) or ComboLibrary.KillableCast(Target, "R")) end)
+		combo:AddCast(_R, function(Target) 
+				if rTick == 0 then
+					rTick = GetTickCount()
+				end 
+				SkillR:Cast(Target) 
+			end)
+		AutoBuff.Instance(SkillW)
 	end 
 
 	function Plugin:OnTick() 
@@ -25,16 +35,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1000
-		combo:AddCasters({SkillQ, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) return ((rTick ~= 0 and GetTickCount() - rTick < 15000) or ComboLibrary.KillableCast(Target, "R")) end)
-		combo:AddCast(_R, function(Target) 
-				if rTick == 0 then
-					rTick = GetTickCount()
-				end 
-				SkillR:Cast(Target) 
-			end)
-		AutoBuff.Instance(SkillW)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Irelia") 

@@ -28,6 +28,9 @@ class 'Plugin' -- {
 	local powerCord = false 
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1000
+		AutoShield.override = true
+		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
 	function Plugin:OnTick() 
@@ -38,7 +41,7 @@ class 'Plugin' -- {
 				targetDamage = DamageCalculation.CalculateRealDamage(Ally, Target) 
 			end 
 			if powerCord then 
-				if damage >= Target.health then 
+				if damage >= Target.health or MovementPrediction.GetDirection(Target) == DIRECTION_AWAY then 
 					if currentAura ~= CELERITY then 
 						SkillE:Cast(Target) 
 					end 
@@ -62,9 +65,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1000
-		AutoShield.override = true
-		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
 	function Plugin:OnGainBuff(unit, buff) 

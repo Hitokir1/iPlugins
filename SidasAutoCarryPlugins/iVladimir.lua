@@ -14,6 +14,11 @@ class 'Plugin' -- {
 	local eTick = 0
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 700
+		combo:AddCasters({SkillQ, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) return (ComboLibrary.KillableCast(Target, "R") or Monitor.CountEnemies(Target, SkillR.width) > Menu.rAmount) end)
+		combo:AddCast(_R, function(Target) SkillR:CastMec(Target, Menu.rAmount) end)
+		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
 	function Plugin:OnTick() 
@@ -30,11 +35,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 700
-		combo:AddCasters({SkillQ, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) return (ComboLibrary.KillableCast(Target, "R") or Monitor.CountEnemies(Target, SkillR.width) > Menu.rAmount) end)
-		combo:AddCast(_R, function(Target) SkillR:CastMec(Target, Menu.rAmount) end)
-		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
 	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Vladimir") 

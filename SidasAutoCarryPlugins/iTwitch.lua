@@ -13,6 +13,13 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1200
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_E, function(Target) 
+				enemy = GetEnemy(Target)
+				return enemy and enemy.posion.count == 6 
+			end)
+		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
 	end 
 
 	function Plugin:OnTick() 
@@ -29,13 +36,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1200
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_E, function(Target) 
-				enemy = GetEnemy(Target)
-				return enemy and enemy.posion.count == 6 
-			end)
-		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
 		for i=0, heroManager.iCount, 1 do
 	        local playerObj = heroManager:GetHero(i)
 	        if playerObj and playerObj.team ~= myHero.team then

@@ -11,6 +11,18 @@ class 'Plugin' -- {
 	local Menu = nil
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 3000
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target)
+				return Menu.rCombo and ComboLibrary.KillableCast(Target, "R") 
+			end)
+		combo:AddCustomCast(_W, function(Target) 
+				return myHero.health / myHero.maxHealth <= (Menu.wPercentage / 100)
+			end)
+		combo:AddCustomCast(_E, function(Target)
+				return EParticle == nil 
+			end)
+		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
 	function Plugin:OnTick() 
@@ -28,18 +40,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 3000
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target)
-				return Menu.rCombo and ComboLibrary.KillableCast(Target, "R") 
-			end)
-		combo:AddCustomCast(_W, function(Target) 
-				return myHero.health / myHero.maxHealth <= (Menu.wPercentage / 100)
-			end)
-		combo:AddCustomCast(_E, function(Target)
-				return EParticle == nil 
-			end)
-		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
 	function Plugin:OnCreateObj(object)

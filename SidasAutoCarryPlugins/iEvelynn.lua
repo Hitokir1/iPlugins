@@ -11,6 +11,15 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 650
+		combo:AddCasters({SkillQ, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) return getDmg("R", Target, myHero) > Target.health or Monitor.CountEnemies(Target, SkillR.range) >= 3 end)
+		combo:AddCast(_R, function(Target) 
+				local p = GetAoESpellPosition(350, Target)
+				if p and GetDistance(p) <= SkillR.range then
+					CastSpell(_R, p.x, p.z)
+				end
+			end)
 	end 
 
 	function Plugin:OnTick() 
@@ -21,15 +30,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 650
-		combo:AddCasters({SkillQ, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) return getDmg("R", Target, myHero) > Target.health or Monitor.CountEnemies(Target, SkillR.range) >= 3 end)
-		combo:AddCast(_R, function(Target) 
-				local p = GetAoESpellPosition(350, Target)
-				if p and GetDistance(p) <= SkillR.range then
-					CastSpell(_R, p.x, p.z)
-				end
-			end)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Evelynn") 

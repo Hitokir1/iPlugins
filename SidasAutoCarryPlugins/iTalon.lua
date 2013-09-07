@@ -10,6 +10,14 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 700
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target)
+				return ComboLibrary.KillableCast(Target, "R") and ValidTarget(Target, SkillR.range) 
+			end)
+		combo:AddCustomCast(_Q, function(Target)
+				return ValidTarget(Target, SkillQ.range)
+			end)
 	end 
 
 	function Plugin:OnTick() 
@@ -20,14 +28,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 700
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target)
-				return ComboLibrary.KillableCast(Target, "R") and ValidTarget(Target, SkillR.range) 
-			end)
-		combo:AddCustomCast(_Q, function(Target)
-				return ValidTarget(Target, SkillQ.range)
-			end)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Talon") 

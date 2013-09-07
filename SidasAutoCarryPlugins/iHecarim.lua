@@ -10,6 +10,12 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 600
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_Q, function(Target) return ValidTarget(Target, SkillQ.range) end)
+		combo:AddCustomCast(_W, function(Target) return ValidTarget(Target, SkillW.range) end)
+		combo:AddCustomCast(_E, function(Target) return ValidTarget(Target, SkillE.range) end)
+		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
 	end 
 
 	function Plugin:OnTick() 
@@ -20,12 +26,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 600
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_Q, function(Target) return ValidTarget(Target, SkillQ.range) end)
-		combo:AddCustomCast(_W, function(Target) return ValidTarget(Target, SkillW.range) end)
-		combo:AddCustomCast(_E, function(Target) return ValidTarget(Target, SkillE.range) end)
-		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Hecarim") 

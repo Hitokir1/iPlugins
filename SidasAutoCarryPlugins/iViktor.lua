@@ -9,7 +9,10 @@ class 'Plugin' -- {
 	local SkillR = Caster(_R, 700, SPELL_CIRCLE) 
 	local combo = ComboLibrary()
 	
-	function Plugin:__init() 
+	function Plugin:__init()
+		AutoCarry.Crosshair.SkillRange = 700
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end) 
 	end 
 
 	function Plugin:OnTick() 
@@ -20,9 +23,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 700
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Viktor") 

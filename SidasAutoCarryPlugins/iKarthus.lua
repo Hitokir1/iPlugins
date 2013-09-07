@@ -15,6 +15,16 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1000
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) 
+				return Menu.rKS 
+			end)
+		combo:AddCast(_E, function(Target) 
+				if (Menu.eMonitor and not eEnabled) and (Target and GetDistance(Target) <= SkillE.range) then
+					SkillE:Cast(Target) 
+				end 
+			end)
 	end 
 
 	function Plugin:OnTick() 
@@ -28,16 +38,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1000
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) 
-				return Menu.rKS 
-			end)
-		combo:AddCast(_E, function(Target) 
-				if (Menu.eMonitor and not eEnabled) and (Target and GetDistance(Target) <= SkillE.range) then
-					SkillE:Cast(Target) 
-				end 
-			end)
 	end 
 
 	function Plugin:OnCreateObj(obj) 

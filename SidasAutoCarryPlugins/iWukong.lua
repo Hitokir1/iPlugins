@@ -10,6 +10,12 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 625
+		combo:AddCasters({SkillQ, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target)
+				return ComboLibrary.KillableCast(Target, "R")
+			end)
+		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
 	function Plugin:OnTick() 
@@ -20,12 +26,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 625
-		combo:AddCasters({SkillQ, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target)
-				return ComboLibrary.KillableCast(Target, "R")
-			end)
-		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "MonkeyKing") 

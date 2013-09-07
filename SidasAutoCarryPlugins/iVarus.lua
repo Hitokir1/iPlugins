@@ -32,6 +32,28 @@ class 'Plugin' -- {
 	local enemyTable = {}
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1600
+		combo:AddCasters({SkillQ, SkillE, SkillR})
+		combo:AddCustomCast(_Q, function(Target) 
+			enemy = GetEnemy(Target)
+			return enemy and ((Menu.wStack == 0) or (enemy.blight.count == Menu.wStack and myHero:GetSpellData(_W).level >= 1)) 
+			end)
+		combo:AddCustomCast(_E, function(Target) 
+			enemy = GetEnemy(Target)
+			return enemy and ((Menu.wStack == 0) or (enemy.blight.count == Menu.wStack and myHero:GetSpellData(_W).level >= 1)) 
+			end)
+		combo:AddCast(_Q, function(Target) 
+				qPrediction = qTargeting:GetPrediction(Target)
+
+				if not qCasted and GetDistance(Target) < 1600 - 2 * Target.ms then 
+					CastQ(0, Target)
+				end 
+				if qCasted and qPrediction and GetDistance(qPrediction) < dynamicRange --[[and qPrediction.networkID == Target.networkID and qPrediction:GetHitChance(Target) > 0.6 
+					and (GetTickCount() - qTick > 300 or (GetDistance(qPrediction) < 800 and GetTickCount() - qTick > 300))]]  then 
+					CastQ(1, qPrediction) 
+				end 
+			end)
+		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R")end)
 	end 
 
 	function Plugin:OnTick() 
@@ -106,18 +128,6 @@ class 'Plugin' -- {
 		end 
 	end 
 
-	function OnLoseBuff(unit, buff) 
-		if unit and buff and buff.source == myHero and buff.name:find("varusw") then 
-			for i, enemy in pairs(enemyTable) do 
-				if enemy and not enemy.dead and enemy.visible and enemy == unit then
-					enemy.blight.tick = GetTickCount()
-					enemy.blight.count = 0
-					PrintFloatText(enemy, 21, "Blight Stacks: " ..buff.stack)
-				end 
-			end 
-		end 
-	end 
-
 	function OnUpdateBuff(unit, buff) 
 		if unit and buff and buff.source == myHero and buff.name:find("varusw") then 
 			for i, enemy in pairs(enemyTable) do 
@@ -131,29 +141,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1600
-		combo:AddCasters({SkillQ, SkillE, SkillR})
-		combo:AddCustomCast(_Q, function(Target) 
-			enemy = GetEnemy(Target)
-			return enemy and ((Menu.wStack == 0) or (enemy.blight.count == Menu.wStack and myHero:GetSpellData(_W).level >= 1)) 
-			end)
-		combo:AddCustomCast(_E, function(Target) 
-			enemy = GetEnemy(Target)
-			return enemy and ((Menu.wStack == 0) or (enemy.blight.count == Menu.wStack and myHero:GetSpellData(_W).level >= 1)) 
-			end)
-		combo:AddCast(_Q, function(Target) 
-				qPrediction = qTargeting:GetPrediction(Target)
-
-				if not qCasted and GetDistance(Target) < 1600 - 2 * Target.ms then 
-					CastQ(0, Target)
-				end 
-				if qCasted and qPrediction and GetDistance(qPrediction) < dynamicRange --[[and qPrediction.networkID == Target.networkID and qPrediction:GetHitChance(Target) > 0.6 
-					and (GetTickCount() - qTick > 300 or (GetDistance(qPrediction) < 800 and GetTickCount() - qTick > 300))]]  then 
-					CastQ(1, qPrediction) 
-				end 
-			end)
-		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R")end)
-
 		for i=0, heroManager.iCount, 1 do
 	        local playerObj = heroManager:GetHero(i)
 	        if playerObj and playerObj.team ~= myHero.team then

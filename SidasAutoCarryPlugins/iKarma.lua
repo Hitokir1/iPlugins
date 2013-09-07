@@ -11,16 +11,6 @@ class 'Plugin' -- {
 	local Menu = nil
 	
 	function Plugin:__init() 
-	end 
-
-	function Plugin:OnTick() 
-		Target = AutoCarry.Crosshair:GetTarget()
-		if Target and AutoCarry.Keys.AutoCarry then
-			combo:CastCombo(Target) 
-		end
-	end 
-
-	function Plugin:OnLoad() 
 		AutoCarry.Crosshair.SkillRange = 1050
 		combo:AddCasters({SkillQ, SkillW, SkillR})
 		combo:AddCast(_R, function(Target) 
@@ -34,6 +24,16 @@ class 'Plugin' -- {
 				end 
 			end)
 		AutoShield.Instance(SkillE.range, SkillE)
+	end 
+
+	function Plugin:OnTick() 
+		Target = AutoCarry.Crosshair:GetTarget()
+		if Target and AutoCarry.Keys.AutoCarry then
+			combo:CastCombo(Target) 
+		end
+	end 
+
+	function Plugin:OnLoad() 
 	end 
 
 	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Karma") 

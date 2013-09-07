@@ -11,6 +11,14 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1000
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_W, function(Target) 
+				local spellName = myHero:GetSpellData(_W).name
+				return (myHero.health < myHero.maxHealth * 0.50 and spellName == "aatroxw2") or
+					(myHero.health > myHero.maxHealth * 0.50 and spellName == "AatroxW") 
+			end)
+		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
 	end 
 
 	function Plugin:OnTick() 
@@ -21,15 +29,7 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 0
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_W, function(Target) 
-				local spellName = myHero:GetSpellData(_W).name
-				return (myHero.health < myHero.maxHealth * 0.50 and spellName == "aatroxw2") or
-					(myHero.health > myHero.maxHealth * 0.50 and spellName == "AatroxW") 
-			end)
-		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
-    end 
+	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Aatrox") 
 -- }

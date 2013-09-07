@@ -16,6 +16,13 @@ class 'Plugin' -- {
 		
 	function Plugin:__init() 
 		BuffManager.Instance()
+		AutoCarry.Crosshair.SkillRange = 1100
+		lastMana = myHero.mana 
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_Q, function(target) return qObject == nil end)
+		--combo:AddCustomCast(_E, function(target) return BuffManager.TargetHaveBuff(target, "chilled") end)
+		combo:AddCustomCast(_R, function(target) return not GlacialStorm and myHero.mana > 200 end)
+		combo:AddCast(_E, function(target) PlaceWall(target) end)
 	end 
 
 	function Plugin:OnTick() 
@@ -36,13 +43,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1100
-		lastMana = myHero.mana 
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_Q, function(target) return qObject == nil end)
-		--combo:AddCustomCast(_E, function(target) return BuffManager.TargetHaveBuff(target, "chilled") end)
-		combo:AddCustomCast(_R, function(target) return not GlacialStorm and myHero.mana > 200 end)
-		combo:AddCast(_E, function(target) PlaceWall(target) end)
 	end 
 
 	function Plugin:OnCreateObj(obj) 

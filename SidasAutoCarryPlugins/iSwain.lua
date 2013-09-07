@@ -17,6 +17,11 @@ class 'Plugin' -- {
 	local Menu = nil 
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 900
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) 
+				return not rActive and ValidTarget(Target, SkillR.range) and ((Menu.rKillable and ComboLibrary.KillableCast(Target, "R")) or not Menu.rKillable)
+			end)
 	end 
 
 	function Plugin:OnTick() 
@@ -36,11 +41,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 900
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) 
-				return not rActive and ValidTarget(Target, SkillR.range) and ((Menu.rKillable and ComboLibrary.KillableCast(Target, "R")) or not Menu.rKillable)
-			end)
 	end 
 
 	function Plugin:OnCreateObj(obj) 

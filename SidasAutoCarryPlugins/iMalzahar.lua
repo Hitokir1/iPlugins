@@ -10,6 +10,12 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 900
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) return not TargetHaveBuff("alzaharnethergraspsound", myHero) and ComboLibrary.KillableCast(Target, "R") end)
+		combo:AddCustomCast(_Q, function(Target) return not TargetHaveBuff("alzaharnethergraspsound", myHero) end)
+		combo:AddCustomCast(_W, function(Target) return not TargetHaveBuff("alzaharnethergraspsound", myHero) end)
+		combo:AddCustomCast(_E, function(Target) return not TargetHaveBuff("alzaharnethergraspsound", myHero) end)	
 	end 
 
 	function Plugin:OnTick() 
@@ -20,12 +26,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 900
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) return not TargetHaveBuff("alzaharnethergraspsound", myHero) and ComboLibrary.KillableCast(Target, "R") end)
-		combo:AddCustomCast(_Q, function(Target) return not TargetHaveBuff("alzaharnethergraspsound", myHero) end)
-		combo:AddCustomCast(_W, function(Target) return not TargetHaveBuff("alzaharnethergraspsound", myHero) end)
-		combo:AddCustomCast(_E, function(Target) return not TargetHaveBuff("alzaharnethergraspsound", myHero) end)	
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Malzahar") 

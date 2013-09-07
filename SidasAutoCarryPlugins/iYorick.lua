@@ -11,6 +11,10 @@ class 'Plugin' -- {
 	local Menu = nil
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 850
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_Q, function(Target) return ValidTarget(Target, SkillQ.range) end)
+		combo:AddCast(_R, function(Target) Combat.CastLowest(SkillR, Menu.rPercentage) end)
 	end 
 
 	function Plugin:OnTick() 
@@ -21,10 +25,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 850
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_Q, function(Target) return ValidTarget(Target, SkillQ.range) end)
-		combo:AddCast(_R, function(Target) Combat.CastLowest(SkillR, Menu.rPercentage) end)
 	end 
 
 	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Yorick") 

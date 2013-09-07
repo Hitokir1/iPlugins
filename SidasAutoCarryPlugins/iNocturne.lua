@@ -10,6 +10,9 @@ class 'Plugin' -- {
 	local Menu = nil
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1200
+		combo:AddCasters({SkillQ, SkillW, SkillE})
+		combo:AddCustomCast(_W, function(Target) return GetDistance(Target) < Menu.wDistance end)
 	end 
 
 	function Plugin:OnTick() 
@@ -20,9 +23,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1200
-		combo:AddCasters({SkillQ, SkillW, SkillE})
-		combo:AddCustomCast(_W, function(Target) return GetDistance(Target) < Menu.wDistance end)
 	end 
 
 	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Nocturne") 

@@ -10,6 +10,10 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 950
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_Q, function(Target) return ValidTarget(Target, SkillQ.range) end)
+		combo:AddCustomCast(_W, function(Target) return ValidTarget(Target, SkillW.range) end)
 	end 
 
 	function Plugin:OnTick() 
@@ -20,10 +24,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 950
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_Q, function(Target) return ValidTarget(Target, SkillQ.range) end)
-		combo:AddCustomCast(_W, function(Target) return ValidTarget(Target, SkillW.range) end)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Shyvana") 

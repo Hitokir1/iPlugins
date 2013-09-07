@@ -9,6 +9,10 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 2000
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
+		combo:AddCast(_E, function(Target) SkillE:CastMouse(mousePos) end)
 	end 
 
 	function Plugin:OnTick() 
@@ -19,10 +23,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 2000
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
-		combo:AddCast(_E, function(Target) SkillE:CastMouse(mousePos) end)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Ezreal") 

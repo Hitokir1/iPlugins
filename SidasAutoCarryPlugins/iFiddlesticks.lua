@@ -17,6 +17,10 @@ class 'Plugin' -- {
 
 		
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 800
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) return (getDmg("R", Target, myHero) >= Target.health or Monitor.CountEnemies(myHero, SkillR.range) >= 2) end)
+		combo:AddCast(_W, function(Target) SkillW:Cast(Target) wTick = GetTickCount() end)
 	end 
 
 	function Plugin:OnTick() 
@@ -28,10 +32,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 800
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) return (getDmg("R", Target, myHero) >= Target.health or Monitor.CountEnemies(myHero, SkillR.range) >= 2) end)
-		combo:AddCast(_W, function(Target) SkillW:Cast(Target) wTick = GetTickCount() end)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Fiddlesticks") 

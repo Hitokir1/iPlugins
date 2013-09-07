@@ -11,6 +11,13 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1200
+		combo:AddCasters({SkillQ, SkillE, SkillR})
+		combo:AddCustomCast(_Q, function(Target) return GetDistance(Target) > Combat.GetTrueRange() end)
+		combo:AddCustomCast(_W, function(Target) return ValidTarget(Target, SkillW.range) end)
+		combo:AddCustomCast(_E, function(Target) return ValidTarget(Target, SkillE.range) end)
+		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
+		AutoShield.Instance(SkillW.range, SkillW) 
 	end 
 
 	function Plugin:OnTick() 
@@ -21,13 +28,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1200
-		combo:AddCasters({SkillQ, SkillE, SkillR})
-		combo:AddCustomCast(_Q, function(Target) return GetDistance(Target) > Combat.GetTrueRange() end)
-		combo:AddCustomCast(_W, function(Target) return ValidTarget(Target, SkillW.range) end)
-		combo:AddCustomCast(_E, function(Target) return ValidTarget(Target, SkillE.range) end)
-		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
-		AutoShield.Instance(SkillW.range, SkillW) 
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Nautilus") 

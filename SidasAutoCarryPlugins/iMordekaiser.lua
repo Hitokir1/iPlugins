@@ -15,17 +15,6 @@ class 'Plugin' -- {
 	local Menu = nil
 	
 	function Plugin:__init() 
-	end 
-
-	function Plugin:OnTick() 
-		Target = AutoCarry.Crosshair:GetTarget()
-		rGhost = myHero:GetSpellData(_R).name == "mordekaisercotgguide"
-		if Target and AutoCarry.Keys.AutoCarry then
-			combo:CastCombo(Target) 
-		end
-	end 
-
-	function Plugin:OnLoad() 
 		AutoCarry.Crosshair.SkillRange = 0
 		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
 		combo:AddCustomCast(_R, function(Target) 
@@ -47,6 +36,17 @@ class 'Plugin' -- {
 				SkillR:Cast(Target) 
 			end)
 		AutoShield.Instance(SkillW.range, SkillW)
+	end 
+
+	function Plugin:OnTick() 
+		Target = AutoCarry.Crosshair:GetTarget()
+		rGhost = myHero:GetSpellData(_R).name == "mordekaisercotgguide"
+		if Target and AutoCarry.Keys.AutoCarry then
+			combo:CastCombo(Target) 
+		end
+	end 
+
+	function Plugin:OnLoad() 
 	end 
 
 	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Mordekaiser") 

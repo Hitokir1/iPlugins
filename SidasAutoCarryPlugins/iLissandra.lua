@@ -14,6 +14,13 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 650
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
+		combo:AddCustomCast(_E, function(Target) return ((eClaw == nil) or (eClaw ~= nil and not eClaw.valid)) end)
+		combo:AddCast(_R, function(Target)
+				SkillR:CastMec(Target, 2)
+			end)
 	end 
 
 	function Plugin:OnTick() 
@@ -27,13 +34,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 650
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
-		combo:AddCustomCast(_E, function(Target) return ((eClaw == nil) or (eClaw ~= nil and not eClaw.valid)) end)
-		combo:AddCast(_R, function(Target)
-				SkillR:CastMec(Target, 2)
-			end)
 	end 
 
 	function Plugin:OnCreateObj(object) 

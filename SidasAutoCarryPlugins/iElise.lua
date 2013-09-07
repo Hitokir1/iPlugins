@@ -24,6 +24,17 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1075
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target)
+				return not SkillQ:Ready() and not SkillW:Ready() and not SkillE:Ready()
+			end)
+		combo:AddCustomCast(_E, function(Target) 
+				if isSpider then
+					return (GetDistance(Target) <= Menu.eRange) or DamageCalculation.CalculateRealDamage(Target) > Target.health 
+				end 
+				return true
+			end)
 	end 
 
 	function Plugin:OnTick() 
@@ -36,17 +47,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 0
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target)
-				return not SkillQ:Ready() and not SkillW:Ready() and not SkillE:Ready()
-			end)
-		combo:AddCustomCast(_E, function(Target) 
-				if isSpider then
-					return (GetDistance(Target) <= Menu.eRange) or DamageCalculation.CalculateRealDamage(Target) > Target.health 
-				end 
-				return true
-			end)
 	end 
 
 	function UpdateSkills() 

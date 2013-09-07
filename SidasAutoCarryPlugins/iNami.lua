@@ -10,6 +10,9 @@ class 'Plugin' -- {
 	local Menu = nil
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1000
+		combo:AddCasters({SkillQ, SkillW, SkillR})
+		combo:AddCustomCast(_R, function(Target) return Menu.useR end)
 	end 
 
 	function Plugin:OnTick() 
@@ -20,9 +23,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1000
-		combo:AddCasters({SkillQ, SkillW, SkillR})
-		combo:AddCustomCast(_R, function(Target) return Menu.useR end)
 		Priority.Instance(true)
 	end 
 

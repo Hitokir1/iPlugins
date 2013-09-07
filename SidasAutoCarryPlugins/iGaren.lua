@@ -11,16 +11,6 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
-	end 
-
-	function Plugin:OnTick() 
-		Target = AutoCarry.Crosshair:GetTarget()
-		if Target and AutoCarry.Keys.AutoCarry then
-			combo:CastCombo(Target) 
-		end
-	end 
-
-	function Plugin:OnLoad() 
 		AutoCarry.Crosshair.SkillRange = 400
 		combo:AddCasters({SkillE, SkillR})
 		AutoShield.Instance(SkillW.range, SkillW)
@@ -31,6 +21,16 @@ class 'Plugin' -- {
 		combo:AddCustomCast(_E, function(Target)
 				return not isSpinning
 			end)
+	end 
+
+	function Plugin:OnTick() 
+		Target = AutoCarry.Crosshair:GetTarget()
+		if Target and AutoCarry.Keys.AutoCarry then
+			combo:CastCombo(Target) 
+		end
+	end 
+
+	function Plugin:OnLoad() 
 	end 
 
 	function Plugin:OnCreateObj(obj) 

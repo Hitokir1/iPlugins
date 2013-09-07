@@ -9,6 +9,8 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 600
+		combo:AddCasters({SkillQ, SkillW, SkillE})
 	end 
 
 	function Plugin:OnTick() 
@@ -19,8 +21,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 600
-		combo:AddCasters({SkillQ, SkillW, SkillE})
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Pantheon") 

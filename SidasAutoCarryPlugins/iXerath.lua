@@ -13,6 +13,11 @@ class 'Plugin' -- {
 	local rTick = 0
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1750
+		combo:AddCasters({SkillQ, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) 
+				return ((rTick ~= 0 and GetTickCount() - rTick < 12000) or (DamageCalculation.CalculateRealDamage(Target) > Target.health or getDmg("R", Target, myHero) > Target.health))
+			end)
 	end 
 
 	function Plugin:OnTick() 
@@ -36,11 +41,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1750
-		combo:AddCasters({SkillQ, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) 
-				return ((rTick ~= 0 and GetTickCount() - rTick < 12000) or (DamageCalculation.CalculateRealDamage(Target) > Target.health or getDmg("R", Target, myHero) > Target.health))
-			end)
 	end 
 
 	function Plugin:OnCreateObj(obj) 

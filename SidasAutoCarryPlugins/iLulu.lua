@@ -6,21 +6,12 @@ class 'Plugin' -- {
 	local SkillQ = Caster(_Q, 950, SPELL_LINEAR, 1350, 0.203, 50, true) 
 	local SkillW = Caster(_W, 650, SPELL_TARGETED) 
 	local SkillE = Caster(_E, 650, SPELL_TARGETED)
+	local SkillEShield = Caster(_E, 650, SPELL_TARGETED_FRIENDLY)
 	local SkillR = Caster(_R, 900, SPELL_TARGETED)
 	local combo = ComboLibrary()
 	local Menu = nil 
 	
 	function Plugin:__init() 
-	end 
-
-	function Plugin:OnTick() 
-		Target = AutoCarry.Crosshair:GetTarget()
-		if Target and AutoCarry.Keys.AutoCarry then
-			combo:CastCombo(Target) 
-		end
-	end 
-
-	function Plugin:OnLoad() 
 		AutoCarry.Crosshair.SkillRange = 950
 		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
 		combo:AddCast(_R, function(Target)
@@ -38,7 +29,17 @@ class 'Plugin' -- {
 				end 
 			end)
 		Priority.Instance(true)
-		AutoShield.Instance(SkillE.range, SkillE)
+		AutoShield.Instance(SkillEShield.range, SkillEShield)
+	end 
+
+	function Plugin:OnTick() 
+		Target = AutoCarry.Crosshair:GetTarget()
+		if Target and AutoCarry.Keys.AutoCarry then
+			combo:CastCombo(Target) 
+		end
+	end 
+
+	function Plugin:OnLoad() 
 	end 
 
 	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Lulu") 

@@ -10,12 +10,23 @@ class 'Plugin' -- {
 	local SkillE = Caster(_E, 650, SPELL_TARGETED)
 	local SkillR = Caster(_R, 645, SPELL_TARGETED)
 
-	function Plugin:__init() end 
+	local Menu = nil
+
+	function Plugin:__init()
+		AutoCarry.Crosshair.SkillRange = 900
+		combo:AddCasters({SkillW, SkillE, SkillR})
+		combo:AddCast(_W, function(target) PlaceWall(target) end)
+		AutoBuff.Instance(SkillQ)
+    end 
 
 	function Plugin:OnTick() 
 		Target = AutoCarry.Crosshair:GetTarget()
 		if Target and AutoCarry.Keys.AutoCarry then
-			combo:CastSequenced(Target) 
+			if Menu.Insec then 
+				combo:CastSequenced(Target, true) 
+			else 
+				combo:CastCombo(Target) 
+			end 
 		end
 	end 
 
@@ -29,12 +40,9 @@ class 'Plugin' -- {
 	end
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 900
-		combo:AddCasters({SkillW, SkillE, SkillR})
-		combo:AddCast(_W, function(target) PlaceWall(target) end)
-		AutoBuff.Instance(SkillQ)
 	end 
 
-	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Tristana") 
+	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Tristana") 
+	Menu:addParam("Insec", "Insec", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("Q"))
 
 -- }

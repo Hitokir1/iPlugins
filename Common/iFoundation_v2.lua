@@ -749,7 +749,7 @@ class "DamageCalculation" -- {
 -- }
 
 class "Monitor" -- {
-	
+
 	Monitor.instance = ""
 
 	function Monitor.Instance() 
@@ -865,7 +865,6 @@ class "Monitor" -- {
 		end 
 		return bestChamp, damage
 	end 
-
 -- }
 
 class '_Heroes' -- {
@@ -1489,10 +1488,14 @@ class 'ComboLibrary' -- {
 		end 
 	end 
 
-	function ComboLibrary:CastSequenced(target) 
+	function ComboLibrary:CastSequenced(target)
+		self:CastSequenced(Target, false) 
+	end 
+
+	function ComboLibrary:CastSequenced(target, override) 
 		if target == nil or target.dead then return false end 
 		for k, caster in pairs(self.casters) do 
-			if self.Menu["use" .. SpellToString(caster.spellVar)] then
+			if self.Menu["use" .. SpellToString(caster.spellVar)] or override then
 				if caster.casterInstance:Ready() and (caster.customCastCondition == nil or caster.customCastCondition(target)) then
 					if caster.customCast ~= nil then
 						caster.customCast(target) 
@@ -1722,57 +1725,78 @@ class 'AutoFarm' -- {
 
 -- }
 
-class 'Menu' -- {
+class 'MovementPrediction' -- {
 
-	Menu.instance = ""
+	DIRECTION_AWAY = 0 
+	DIRECTION_TOWARDS = 1
+	
+	MovementPrediction.instance = ""
 
-	function Menu.Instance() 
-		if Menu.instance == "" then Menu.instance = Menu() end return Menu.instance 
+	function MovementPrediction.Instance() 
+		if MovementPrediction.instance == "" then MovementPrediction.instance = MovementPrediction() end return MovementPrediction.instance 
 	end 
 
-	function Menu:__init() 
-		self.config = {}
+	function MovementPrediction:__init() 
+		self.MovementTable = {}
+		for i=0, heroManager.iCount, 1 do
+	        local playerObj = heroManager:GetHero(i)
+	        if playerObj and playerObj.team ~= myHero.team then
+	            self.MovementTable[playerObj.networkID] = 0
+	        end
+		end
 	end 
 
-	function Menu.AddConfig(name, privateName) 
-		Menu.Instance():_AddConfig(name, privateName)
+	function MovementPrediction.GetDirection(Target)
+		return MovementPrediction.Instance():_GetDirection(Target)
 	end 
 
-	function Menu:_AddConfig(name, privateName) 
-		if self.config[privateName] == nil then
-			self.config[privateName] = {display = name, params = {}, menu = nil}
-		end 
-	end 
+	function MovementPrediction:_GetDirection(Target)
+		if Target and not Target.dead then 
+			local last = self.MovementTable[Target.networkID]
+			local current = GetDistance(Target)
+			
+			if current then 
+				self.MovementTable[Target.networkID] = GetDistance(Target) 
+			end 
 
-	function Menu.AddOption(privateName, table) 
-		Menu.Instance():_AddOption(privateName, table) 
-	end 
-
-	function Menu:_AddOption(privateName, table) 
-		if self.config[privateName] ~= nil then 
-			table.insert(self.config[privateName].params, table)
-		end 
-	end 
-
-	function Menu.GetMenu(privateName) 
-		return Menu.Instance():_GetMenu(privateName)
-	end 
-
-	function Menu:_GetMenu(privateName)
-		return self.config[privateName].menu 
-	end 
-
-	function Menu.CreateMenus() 
-		Menu.Instance():_CreateMenus()
-	end 
-
-	function Menu:_CreateMenus() 
-		for privateName, value in pairs(self.config) do 
-			self.config[privateName].menu = scriptConfig(value.display, privateName) 
-			for key, entry in pairs(value.params) do 
-				self.config[privateName].menu:addParam(unpack(entry))
+			if current < last then 
+				return DIRECTION_TOWARDS 
+			elseif current > last then 
+				return DIRECTION_AWAY
 			end 
 		end 
-	end 		
+	end 
+
+	function MovementPrediction.Place(Skill, Target) 
+		MovementPrediction.Instance():_Place(Skill, Target)
+	end 
+
+	function MovementPrediction:_Place(Skill, Target)
+		if self:_GetDirection(Target) == DIRECTION_TOWARDS then 
+			self.PlaceInfront(Skill, Target)
+		elseif self:_GetDirection(Target) == DIRECTION_AWAY then 
+			PrintChat("b")
+			self.PlaceBehind(Skill, Target)
+		end 
+	end 
+
+	function MovementPrediction.PlaceBehind(Skill, enemy) 
+		if Skill:Ready() and GetDistance(enemy) <= Skill.range then
+			local TargetPosition = Vector(enemy.x, enemy.y, enemy.z)
+			local MyPosition = Vector(myHero.x, myHero.y, myHero.z)		
+			local WallPosition = TargetPosition + (TargetPosition - MyPosition)*((150/GetDistance(enemy)))
+			CastSpell(Skill.spell, WallPosition.x, WallPosition.z)
+		end
+	end
+
+	function MovementPrediction.PlaceInfront(Skill, enemy) 
+		if Skill:Ready() and GetDistance(enemy) <= Skill.range then 
+			local position = Vector(enemy.x, enemy.y, enemy.z)
+			local myPosition = Vector(myHero.x, myHero.y, myHero.z)
+			local vector = (position - myPosition) * (GetDistance(Target) - 100)
+			CastSpell(Skill.spell, vector.x, vector.z)
+		end 
+	end 
 
 -- }
+

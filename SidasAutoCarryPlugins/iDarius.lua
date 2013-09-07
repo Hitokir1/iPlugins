@@ -21,6 +21,16 @@ class 'Plugin' -- {
 
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 600
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, 
+			function(Target)
+				local hemoCount = GetEnemy(Target).hemo.count
+				return (getDmg("R", Target, myHero) * (hemoCount * 0.2) > Target.health) or (hemoCount == 5) 
+			end)
+		combo:AddCustomCast(_Q, function(Target) return ValidTarget(Target, SkillQ.range) end)
+		combo:AddCustomCast(_W, function(Target) return ValidTarget(Target, SkillW.range) end)
+		combo:AddCustomCast(_E, function(Target) return ValidTarget(Target, SkillE.range) end)
 	end 
 
 	function Plugin:OnTick() 
@@ -33,16 +43,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 600
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, 
-			function(Target)
-				local hemoCount = GetEnemy(Target).hemo.count
-				return (getDmg("R", Target, myHero) * (hemoCount * 0.2) > Target.health) or (hemoCount == 5) 
-			end)
-		combo:AddCustomCast(_Q, function(Target) return ValidTarget(Target, SkillQ.range) end)
-		combo:AddCustomCast(_W, function(Target) return ValidTarget(Target, SkillW.range) end)
-		combo:AddCustomCast(_E, function(Target) return ValidTarget(Target, SkillE.range) end)
 		for i=0, heroManager.iCount, 1 do
 	        local playerObj = heroManager:GetHero(i)
 	        if playerObj and playerObj.team ~= myHero.team then

@@ -12,6 +12,11 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1000
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_W, function(target) return ValidTarget(target, SkillW.range) end)
+		combo:AddCustomCast(_R, function(target) return (DamageCalculation.CalculateRealDamage(target) > target.health) or ((getDmg("R", target, myHero) * 3) > target.health) end)
+		combo:AddCast(_R, function(target) SkillR:CastMouse(mousePos) end)
 	end 
 
 	function Plugin:OnTick() 
@@ -22,11 +27,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1000
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_W, function(target) return ValidTarget(target, SkillW.range) end)
-		combo:AddCustomCast(_R, function(target) return (DamageCalculation.CalculateRealDamage(target) > target.health) or ((getDmg("R", target, myHero) * 3) > target.health) end)
-		combo:AddCast(_R, function(target) SkillR:CastMouse(mousePos) end)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Ahri") 

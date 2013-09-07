@@ -11,6 +11,9 @@ class 'Plugin' -- {
 	local combo = ComboLibrary()
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1000
+		combo:AddCasters({SkillQ, SkillE})
+		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
 	function Plugin:OnTick() 
@@ -27,9 +30,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1000
-		combo:AddCasters({SkillQ, SkillE})
-		AutoShield.Instance(SkillW.range, SkillW)
 	end 
 
 	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Shen") 

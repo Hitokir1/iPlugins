@@ -13,6 +13,11 @@ class 'Plugin' -- {
 
 
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1200
+		AutoShield.Instance(SkillE.range, SkillE)
+		AutoBuff.Instance(SkillW)
+		combo:AddCasters({SkillQ, SkillR})
+		combo:AddCustomCast(_R, function(Target) return (DamageCalculation.CalculateRealDamage(Target) > Target.health or getDmg("R", Target, myHero) > Target.health) end)
 	end 
 
 	function Plugin:OnTick() 
@@ -23,11 +28,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1200
-		AutoShield.Instance(SkillE.range, SkillE)
-		AutoBuff.Instance(SkillW)
-		combo:AddCasters({SkillQ, SkillR})
-		combo:AddCustomCast(_R, function(Target) return (DamageCalculation.CalculateRealDamage(Target) > Target.health or getDmg("R", Target, myHero) > Target.health) end)
 	end 
 
 	local Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Sivir") 

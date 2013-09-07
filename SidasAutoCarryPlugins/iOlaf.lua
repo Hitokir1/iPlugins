@@ -14,6 +14,11 @@ class 'Plugin' -- {
 	local Menu = nil
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 1000
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_R, function(Target) 
+			return myHero.isTaunted or myHero.isCharmed or myHero.isFeared or myHero.isFleeing
+			end)
 	end 
 
 	function Plugin:OnTick() 
@@ -33,11 +38,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 1000
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_R, function(Target) 
-			return myHero.isTaunted or myHero.isCharmed or myHero.isFeared or myHero.isFleeing
-			end)
 	end 
 
 	function Plugin:OnCreateObj(obj) 

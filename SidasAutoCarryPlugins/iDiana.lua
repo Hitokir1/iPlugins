@@ -50,6 +50,18 @@ class 'Plugin' -- {
 	local SkillR = Caster(_R, 825, SPELL_TARGETED)
 	
 	function Plugin:__init() 
+		AutoCarry.Crosshair.SkillRange = 830
+		BuffManager.Instance()
+		enemyMinions = minionManager(MINION_ENEMY, rangeMax, player, MINION_SORT_HEALTH_ASC)
+		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
+		combo:AddCustomCast(_Q, function(Target) return ValidTarget(Target, SkillQ.range) end)
+		combo:AddCustomCast(_W, function(Target) return ValidTarget(Target, SkillW.range) end)
+		combo:AddCustomCast(_E, function(Target) return ValidTarget(Target, SkillE.range) end)
+		combo:AddCustomCast(_R, function(Target) return BuffManager.TargetHaveBuff(Target, "dianamoonlight") or  getDmg("R", Target, myHero) > Target.health end)
+		combo:AddCast(_Q, function(Target) 
+				CrescentCollision(MODE_CHAMP)
+				CastQ()
+			end)
 	end 
 
 	function Plugin:OnTick() 
@@ -69,18 +81,6 @@ class 'Plugin' -- {
 	end 
 
 	function Plugin:OnLoad() 
-		AutoCarry.Crosshair.SkillRange = 830
-		BuffManager.Instance()
-		enemyMinions = minionManager(MINION_ENEMY, rangeMax, player, MINION_SORT_HEALTH_ASC)
-		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
-		combo:AddCustomCast(_Q, function(Target) return ValidTarget(Target, SkillQ.range) end)
-		combo:AddCustomCast(_W, function(Target) return ValidTarget(Target, SkillW.range) end)
-		combo:AddCustomCast(_E, function(Target) return ValidTarget(Target, SkillE.range) end)
-		combo:AddCustomCast(_R, function(Target) return BuffManager.TargetHaveBuff(Target, "dianamoonlight") or  getDmg("R", Target, myHero) > Target.health end)
-		combo:AddCast(_Q, function(Target) 
-				CrescentCollision(MODE_CHAMP)
-				CastQ()
-			end)
 	end 
 
 	function Plugin:OnProcessSpell(unit, spell)
