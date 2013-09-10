@@ -12,6 +12,9 @@ class 'Plugin' -- {
 		AutoCarry.Crosshair.SkillRange = 2000
 		combo:AddCasters({SkillQ, SkillW, SkillE, SkillR})
 		combo:AddCustomCast(_R, function(Target) return ComboLibrary.KillableCast(Target, "R") end)
+		combo:AddCustomCast(_E, function(Target)
+			return not UnderTower(Target) 
+			end)
 		combo:AddCast(_E, function(Target) SkillE:CastMouse(mousePos) end)
 	end 
 

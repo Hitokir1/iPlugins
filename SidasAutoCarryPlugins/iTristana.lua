@@ -21,7 +21,9 @@ class 'Plugin' -- {
 
 	function Plugin:OnTick() 
 		Target = AutoCarry.Crosshair:GetTarget()
-		if Target and AutoCarry.Keys.AutoCarry then
+		if Menu.wJump and SkillW:Ready() then 
+			SkillE:CastMouse(mousePos)
+		elseif Target and AutoCarry.Keys.AutoCarry then
 			if Menu.Insec then 
 				combo:CastSequenced(Target, true) 
 			else 
@@ -44,5 +46,6 @@ class 'Plugin' -- {
 
 	Menu = AutoCarry.Plugins:RegisterPlugin(Plugin(), "Tristana") 
 	Menu:addParam("Insec", "Insec", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("Q"))
+	Menu:addParam("wJump", "W Jump to Mouse", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("E"))
 
 -- }
