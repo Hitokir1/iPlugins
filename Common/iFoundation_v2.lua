@@ -561,8 +561,9 @@ class "Drawing" -- {
 	function Drawing:__init()
 		self.queue = {}
 		self.Menu = scriptConfig("iFoundation: Drawing", "idrawing" .. myHero.charName)
-		self.Menu:addParam("drawPlayers", "Draw Players", SCRIPT_PARAM_ONOFF, true)
-		self.Menu:addParam("drawLines", "Draw Lines to Players", SCRIPT_PARAM_ONOFF, true)
+		self.Menu:addParam("drawPlayers", "Draw Players", SCRIPT_PARAM_ONOFF, false)
+		self.Menu:addParam("drawTarget", "Draw Target", SCRIPT_PARAM_ONOFF, true)
+		self.Menu:addParam("drawLines", "Draw Lines to Players", SCRIPT_PARAM_ONOFF, false)
 		self.Menu:addParam("playerDistance", "Max distance to draw players",SCRIPT_PARAM_SLICE, 1600, 0, 3000, 0)
 		AddDrawCallback(function(obj) self:OnDraw() end)
 	end 
@@ -599,12 +600,21 @@ class "Drawing" -- {
 				end 
 			end 
 		end 
+
+		if self.Menu.drawTarget then 
+			local target = AutoCarry.Crosshair:GetTarget()
+			if ValidTarget(target) and target.dead ~= true and target ~= myHero and target.team == TEAM_ENEMY and GetDistance(target) <= self.Menu.playerDistance then 
+				self:DrawTarget(target)
+			end 
+		end 
 	end 
 
 	function Drawing:DrawTarget(Target) 
 		if myHero.dead or not myHero.valid then return false end 
 		local totalDamage = DamageCalculation.CalculateBurstDamage(Target)
 		local realDamage = DamageCalculation.CalculateRealDamage(Target) 
+		local dps = myHero:CalcDamage(Target, myHero.damage) * myHero.attackSpeed
+		local ttk = (Target.health - realDamage) / dps 
 		local tempColor = _ColorARGB.Red 
 		local tempText = "Not Ready"
 		if Target.health <= realDamage then
@@ -617,7 +627,7 @@ class "Drawing" -- {
 		for w = 0, 15 do 
 			DrawCircle(Target.x, Target.y, Target.z, 40 + w * 1.5, tempColor:ToARGB())
 		end 
-		PrintFloatText(Target, 0, tempText .. " DMG: " .. round(realDamage))
+		PrintFloatText(Target, 0, tempText .. " DMG: " .. round(realDamage) .. " (" .. string.format("%4.1f", ttk) .. "s)")
 		if GetDistance(Target) <= self.Menu.playerDistance and self.Menu.drawLines then 
 			DrawArrows(myHero, Target, 30, 0x099B2299, 50)
 		end 
@@ -1613,8 +1623,8 @@ class 'AutoKS' -- {
 	function AutoKS:_AddCaster(caster)
 		local tempSpell = SpellToString(caster.spell)
 		self.Menu:addParam("sepks" .. tempSpell, "-- " .. tempSpell .. " Options --", SCRIPT_PARAM_INFO, "")
-		self.Menu:addParam("use" .. tempSpell, "Use " .. tempSpell .. " for KS", SCRIPT_PARAM_ONOFF, true)
-		self.Menu:addParam("message" .. tempSpell, "Message for " .. tempSpell .. " KS", SCRIPT_PARAM_ONOFF, true)
+		self.Menu:addParam("use" .. tempSpell, "Use " .. tempSpell .. " for KS", SCRIPT_PARAM_ONOFF, false)
+		self.Menu:addParam("message" .. tempSpell, "Message for " .. tempSpell .. " KS", SCRIPT_PARAM_ONOFF, false)
 		--self.Menu:addParam("color" .. tempSpell, tempSpell .. " Color", SCRIPT_PARAM_COLOR, {0, 200, 150, 255})
 		table.insert(self.casters, {casterInstance = caster, string = tempSpell})
 	end 
@@ -1772,9 +1782,11 @@ class 'MovementPrediction' -- {
 	end 
 
 	function MovementPrediction:_Place(Skill, Target)
-		if self:_GetDirection(Target) == DIRECTION_TOWARDS then 
+		local direction = self:_GetDirection(Target)
+		if direction == DIRECTION_TOWARDS then 
+			PrintChat("a")
 			self.PlaceInfront(Skill, Target)
-		elseif self:_GetDirection(Target) == DIRECTION_AWAY then 
+		elseif direction == DIRECTION_AWAY then 
 			PrintChat("b")
 			self.PlaceBehind(Skill, Target)
 		end 
@@ -1791,10 +1803,10 @@ class 'MovementPrediction' -- {
 
 	function MovementPrediction.PlaceInfront(Skill, enemy) 
 		if Skill:Ready() and GetDistance(enemy) <= Skill.range then 
-			local position = Vector(enemy.x, enemy.y, enemy.z)
-			local myPosition = Vector(myHero.x, myHero.y, myHero.z)
-			local vector = (position - myPosition) * (GetDistance(Target) - 100)
-			CastSpell(Skill.spell, vector.x, vector.z)
+			MPos = Vector(enemy.x, enemy.y, enemy.z)
+      		HeroPos = Vector(myHero.x, myHero.y, myHero.z)
+        	pos = HeroPos + ( HeroPos - MPos )*(500/GetDistance(enemy))
+        	CastSpell(Skill.spell, pos.x, pos.z) 
 		end 
 	end 
 
