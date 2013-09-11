@@ -1803,10 +1803,10 @@ class 'MovementPrediction' -- {
 
 	function MovementPrediction.PlaceInfront(Skill, enemy) 
 		if Skill:Ready() and GetDistance(enemy) <= Skill.range then 
-			MPos = Vector(enemy.x, enemy.y, enemy.z)
-      		HeroPos = Vector(myHero.x, myHero.y, myHero.z)
-        	pos = HeroPos + ( HeroPos - MPos )*(500/GetDistance(enemy))
-        	CastSpell(Skill.spell, pos.x, pos.z) 
+			local TargetPosition = Vector(enemy.x, enemy.y, enemy.z)
+      		local MyPosition = Vector(myHero.x, myHero.y, myHero.z)
+        	local SpellPosition = TargetPosition + (TargetPosition - MyPosition) * (-100 / GetDistance(enemy))
+        	CastSpell(Skill.spell, SpellPosition.x, SpellPosition.z) 
 		end 
 	end 
 
