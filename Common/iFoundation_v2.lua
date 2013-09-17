@@ -260,7 +260,7 @@ class 'Caster' -- {
 		local min = minTargets or 1
 		local point = GetAoESpellPosition(self.width, Target) 
 		if GetDistance(point) <= self.range and Monitor.CountEnemies(point, self.width) >= min then
-			CastSpell(self.spell, point.x, point.y)
+			CastSpell(self.spell, point.x, point.z)
 			return true 
 		end 
 		return false 
@@ -1147,6 +1147,20 @@ class 'Combat' -- {
 		end 
 	end 
 
+	function Combat.GetNearestEnemy(range)
+		local distance = math.huge
+		local best = nil
+		for index, player in pairs(_Heroes.GetObjects(ENEMY, range)) do 
+			if player and not player.dead then 
+				if GetDistance(player) < distance then 
+					best = player
+					distance = GetDistance(player)
+				end 
+			end 
+		end 
+		return best
+	end 
+
 -- }
 
 class 'AutoShield' -- {
@@ -1573,7 +1587,7 @@ class 'BuffManager' -- {
 		if unit.team ~= myHero.team then 
 			if self.enemies[unit.name] ~= nil then 
 				for i=0, #self.enemies[unit.name], 1 do 
-					if self.enemies[unit.name][i] == buff then
+					if self.enemies[unit.name][i] == buff.networkID then
 						table.remove(self.enemies[unit.name], i)
 						break 
 					end 
@@ -1807,6 +1821,63 @@ class 'MovementPrediction' -- {
       		local MyPosition = Vector(myHero.x, myHero.y, myHero.z)
         	local SpellPosition = TargetPosition + (TargetPosition - MyPosition) * (-100 / GetDistance(enemy))
         	CastSpell(Skill.spell, SpellPosition.x, SpellPosition.z) 
+		end 
+	end 
+
+-- }
+
+class 'AutoHealing' -- {
+	
+	function AutoHealing:__init(caster)
+		self.Team = {}
+		for i=0, heroManager.iCount, 1 do
+	        local player = heroManager:GetHero(i)
+	        if player and player.team == myHero.team then
+	           table.insert(self.Team, {instance = player, weight = 0})
+	        end
+		end
+		self.Caster = caster
+	end 
+
+	function AutoHealing:_GetWeight(Ally) 
+		if not Ally then return end 
+		local missingHealth = Ally.maxHealth - Ally.health
+		local damage = Ally.totalDamage
+		local enemies = Monitor.CountEnemies(Target, 300)
+		local distance = GetDistance(Ally)
+		return (enemies * 5) + (missingHealth * 4) + (damage * 3) - (distance * 2)
+	end 
+
+	function AutoHealing:_Weigh()
+		for index, player in pairs(self.Team) do 
+			if player.instance and not player.instance.dead then 
+				if GetDistance(player.instance) <= self.Caster.range then 
+					self.Team[index].weight = self:_GetWeight(player)
+				end 
+			end 
+		end 
+		table.sort(self.Team, function(a, b) 
+				return a.weight > b.weight
+			end)
+	end 
+
+	function AutoHealing:_GetBest()
+		self:_Weigh()
+		if self.Team[1] then
+			return self.Team[1]
+		end 
+		for i=1, #self.Team, 1 do 
+			local player = self.Team[i]
+			if player and not player.dead then 
+				return player 
+			end 
+		end 
+	end 
+
+	function AutoHealing:OnTick()
+		local player = self:_GetBest()
+		if player and not player.dead and GetDistance(player) < self.Caster.range then 
+			self.Caster:Cast(player)
 		end 
 	end 
 
